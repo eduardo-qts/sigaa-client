@@ -1,0 +1,84 @@
+{
+  "name": "sigaa-client",
+  "version": "0.1.0",
+  "description": "Cliente TypeScript não oficial para o SIGAA da UFSJ (Universidade Federal de São João del-Rei).",
+  "keywords": [
+    "sigaa",
+    "ufsj",
+    "cliente",
+    "scraper",
+    "typescript"
+  ],
+  "homepage": "https://github.com/eduardo-qts/sigaa-client#readme",
+  "bugs": {
+    "url": "https://github.com/eduardo-qts/sigaa-client/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eduardo-qts/sigaa-client.git"
+  },
+  "license": "MIT",
+  "author": "Eduardo Quirino",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.28.5",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "audit:prod": "pnpm audit --prod --audit-level moderate",
+    "docs:api": "typedoc",
+    "verify": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build",
+    "prepublishOnly": "pnpm verify",
+    "audit": "pnpm audit --audit-level moderate"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.43",
+    "@vitest/coverage-v8": "^5.0.4",
+    "domhandler": "^6.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.4"
+  }
+}
