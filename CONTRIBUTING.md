@@ -5,7 +5,7 @@ e a privacidade das pessoas.
 
 ## Ambiente
 
-Requisitos: Node.js 20+ e pnpm (`corepack enable` ou `npm install -g pnpm`).
+Requisitos: Node.js 22.13+ (exigência do pnpm 11; a biblioteca em si suporta Node 20+) e pnpm (`corepack enable` ou `npm install -g pnpm`).
 
 ```sh
 git clone https://github.com/eduardo-qts/sigaa-client.git
@@ -54,6 +54,6 @@ examples/            exemplos executáveis e tipados
 
 1. Atualize `version` em `package.json` **e** em `src/version.ts` (um teste garante que coincidem) e o `CHANGELOG.md`.
 2. `git tag vX.Y.Z && git push --tags`.
-3. O workflow `release.yml` verifica e publica com _provenance_ (requer o segredo `NPM_TOKEN`).
+3. O workflow `release.yml` verifica e publica com _provenance_ via _trusted publishing_ (OIDC, sem token); configure uma vez no npmjs.com.
 
 Publicação manual: `npm login` e `pnpm publish --access public` (o `prepublishOnly` roda `pnpm verify`).

@@ -35,7 +35,7 @@
 
 ## Instalação
 
-Requer **Node.js 20+**.
+Requer **Node.js 20+** para usar a biblioteca.
 
 **pnpm**
 

@@ -15,4 +15,4 @@ Primeira versão: biblioteca escrita do zero, focada no SIGAA da UFSJ.
 - ESM + CJS com tipos TypeScript; única dependência de produção: `cheerio`.
 - Navegação serializada por sessão, retentativas apenas para GET, timeout configurável.
 - Suíte de testes offline (SIGAA falso + fixtures sintéticas) e testes de integração opcionais.
-- Pipeline: CI (Node 20/22/24), auditoria, CodeQL, Gitleaks, Scorecard, release com provenance.
+- Pipeline: CI (Node 22/24 + instalação do pacote em Node 20/22/24), auditoria, CodeQL, Gitleaks, Scorecard, release com provenance.

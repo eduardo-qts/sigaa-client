@@ -1,5 +1,9 @@
 name: Release
 
+# Publica no npm ao criar uma tag `vX.Y.Z`.
+# Usa "trusted publishing" (OIDC): sem token guardado. Configure uma única vez em
+# npmjs.com > sigaa-client > Settings > Trusted Publisher > GitHub Actions
+# (usuário eduardo-qts, repositório sigaa-client, workflow release.yml).
 on:
   push:
     tags: ['v*']
@@ -12,17 +16,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm provenance
+      id-token: write # OIDC: trusted publishing e provenance
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # npm >= 11.5.1 é necessário para o trusted publishing
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
-      - run: pnpm publish --access public --provenance --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Confere se a tag coincide com a versão do pacote
+        run: test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
+      - run: npm publish --provenance --access public

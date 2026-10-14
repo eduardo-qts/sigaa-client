@@ -36,13 +36,13 @@ Rode com pouca frequência, só com a sua conta, e nunca em CI público. Nada é
 
 ## Pipeline (GitHub Actions)
 
-| Workflow         | Quando                   | O que faz                                                                                   |
-| ---------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
-| `ci.yml`         | push em `main` e PRs     | typecheck, lint, formatação, testes com cobertura, build, e instalação do pacote empacotado |
-| `security.yml`   | push, PRs e semanal      | `pnpm audit` (todas as dependências), CodeQL, Gitleaks e _dependency review_ (nos PRs)      |
-| `scorecard.yml`  | push em `main` e semanal | OpenSSF Scorecard                                                                           |
-| `release.yml`    | tag `v*`                 | `pnpm verify` e publicação no npm com _provenance_ (segredo `NPM_TOKEN`)                    |
-| `dependabot.yml` | semanal                  | PRs de atualização de dependências e de _actions_                                           |
+| Workflow         | Quando                   | O que faz                                                                                                              |
+| ---------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`         | push em `main` e PRs     | typecheck, lint, formatação, testes com cobertura e build (Node 22 e 24); instala o pacote com npm em Node 20, 22 e 24 |
+| `security.yml`   | push, PRs e semanal      | `pnpm audit` (todas as dependências), CodeQL, Gitleaks e _dependency review_ (nos PRs)                                 |
+| `scorecard.yml`  | push em `main` e semanal | OpenSSF Scorecard                                                                                                      |
+| `release.yml`    | tag `v*`                 | `pnpm verify` e publicação no npm com _provenance_ via _trusted publishing_ (OIDC, sem token)                          |
+| `dependabot.yml` | semanal                  | PRs de atualização de dependências e de _actions_                                                                      |
 
 ## Auditoria local
 

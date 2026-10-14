@@ -13,13 +13,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Node ${{ matrix.node }}
+  # O toolchain de desenvolvimento (pnpm 11) exige Node >= 22.13.
+  verify:
+    name: Verificação (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24]
+        node: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -33,26 +34,39 @@ jobs:
       - run: pnpm format:check
       - run: pnpm test:coverage
       - run: pnpm build
+      - name: Empacota para o teste de instalação
+        if: matrix.node == 22
+        run: pnpm pack --pack-destination "$RUNNER_TEMP/pkg"
+      - name: Guarda o pacote
+        if: matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: ${{ runner.temp }}/pkg/*.tgz
+          if-no-files-found: error
 
+  # A biblioteca suporta Node >= 20: instala o tarball com npm (sem pnpm) em cada versão.
   package:
-    name: Pacote instalável (npm, ESM, CJS e tipos)
+    name: Pacote no Node ${{ matrix.node }} (npm, ESM, CJS e tipos)
     runs-on: ubuntu-latest
-    needs: test
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+          path: ${{ runner.temp }}/pkg
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+          node-version: ${{ matrix.node }}
       - name: Instala o tarball com npm e importa a biblioteca
         run: |
-          pnpm pack --pack-destination "$RUNNER_TEMP"
           mkdir "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
           npm init -y >/dev/null
-          npm install "$RUNNER_TEMP"/sigaa-client-*.tgz typescript@5 @types/node@20
+          npm install "$RUNNER_TEMP"/pkg/sigaa-client-*.tgz typescript@5 @types/node@20
           cat > esm.mjs <<'EOF'
           import { SigaaClient } from 'sigaa-client';
           new SigaaClient();
