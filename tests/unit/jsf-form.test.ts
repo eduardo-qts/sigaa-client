@@ -38,6 +38,15 @@ describe('parseJsfLink', () => {
     expect(link?.params).toEqual({ k: "it's", b: 'a\\b' });
   });
 
+  it('trata chaves como __proto__ como dados comuns (sem alterar o objeto)', () => {
+    const link = parseJsfLink(
+      "jsfcljs(document.getElementById('f'),{'__proto__':'x','constructor':'y','a':'b'},'')"
+    );
+    expect(Object.keys(link?.params ?? {})).toEqual(['__proto__', 'constructor', 'a']);
+    expect(link?.params['__proto__']).toBe('x');
+    expect(Object.getPrototypeOf(link?.params)).toBeNull();
+  });
+
   it('retorna undefined sem chamada jsfcljs', () => {
     expect(parseJsfLink('return false')).toBeUndefined();
     expect(parseJsfLink(undefined)).toBeUndefined();

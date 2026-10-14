@@ -29,7 +29,8 @@ export function parseJsfLink(onclick: string | undefined): JsfLink | undefined {
   const match = onclick ? JSFCLJS.exec(onclick) : null;
   if (!match) return undefined;
   const [, formId = '', body = '', target = ''] = match;
-  const params: Record<string, string> = {};
+  // Sem protótipo: uma chave como `__proto__` enviada pelo servidor vira dado, não altera o objeto.
+  const params: Record<string, string> = Object.create(null) as Record<string, string>;
   for (const pair of body.matchAll(new RegExp(`${JS_STRING}\\s*:\\s*${JS_STRING}`, 'g'))) {
     params[unescapeJs(pair[1] ?? '')] = unescapeJs(pair[2] ?? '');
   }
