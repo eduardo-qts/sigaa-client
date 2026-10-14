@@ -4,3 +4,4 @@ docs/api/
 pnpm-lock.yaml
 LICENSE
 tests/fixtures/
+tests/consumer/package-lock.json

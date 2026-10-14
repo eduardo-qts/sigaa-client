@@ -3,7 +3,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist/', 'coverage/', 'docs/api/', 'node_modules/', '.scratch/'] },
+  { ignores: ['dist/', 'coverage/', 'docs/api/', 'node_modules/', '.scratch/', 'tests/consumer/'] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {

@@ -45,7 +45,8 @@ jobs:
           path: ${{ runner.temp }}/pkg/*.tgz
           if-no-files-found: error
 
-  # A biblioteca suporta Node >= 20: instala o tarball com npm (sem pnpm) em cada versão.
+  # A biblioteca suporta Node >= 20: valida o tarball em cada versão, com npm (sem pnpm).
+  # O consumidor (tests/consumer) usa lockfile; o tarball é descompactado em node_modules.
   package:
     name: Pacote no Node ${{ matrix.node }} (npm, ESM, CJS e tipos)
     runs-on: ubuntu-latest
@@ -55,6 +56,7 @@ jobs:
       matrix:
         node: [20, 22, 24]
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: package
@@ -62,25 +64,13 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ matrix.node }}
-      - name: Instala o tarball com npm e importa a biblioteca
+      - name: Importa o pacote em ESM, CJS e TypeScript
         run: |
-          mkdir "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
-          npm init -y >/dev/null
-          npm install "$RUNNER_TEMP"/pkg/sigaa-client-*.tgz typescript@5 @types/node@20
-          cat > esm.mjs <<'EOF'
-          import { SigaaClient } from 'sigaa-client';
-          new SigaaClient();
-          console.log('ESM ok');
-          EOF
-          cat > cjs.cjs <<'EOF'
-          const { SigaaClient } = require('sigaa-client');
-          new SigaaClient();
-          console.log('CJS ok');
-          EOF
-          cat > types.ts <<'EOF'
-          import { SigaaClient } from 'sigaa-client';
-          export const client: SigaaClient = new SigaaClient({ timeoutMs: 5000 });
-          EOF
+          cp -r tests/consumer "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+          npm ci
+          mkdir -p node_modules/sigaa-client
+          tar -xzf "$RUNNER_TEMP"/pkg/sigaa-client-*.tgz --strip-components=1 -C node_modules/sigaa-client
           node esm.mjs
           node cjs.cjs
-          npx tsc --noEmit --strict --module nodenext --moduleResolution nodenext --target es2022 types.ts
+          ./node_modules/.bin/tsc --noEmit --strict --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022 types.ts

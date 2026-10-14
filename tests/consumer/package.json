@@ -1,0 +1,12 @@
+{
+  "name": "sigaa-client-consumer-fixture",
+  "private": true,
+  "description": "Projeto consumidor usado no CI para validar o pacote publicado (ESM, CJS e tipos).",
+  "dependencies": {
+    "cheerio": "1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "typescript": "5.9.3"
+  }
+}
