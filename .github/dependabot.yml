@@ -16,6 +16,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      # init, analyze e upload-sarif precisam estar sempre na mesma versão.
+      codeql:
+        patterns: ['github/codeql-action/*']
   - package-ecosystem: npm
     directory: /tests/consumer
     schedule:
