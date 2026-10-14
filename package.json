@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^20.19.43",
+    "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.4",
     "domhandler": "^6.0.1",
     "eslint": "^10.12.0",
