@@ -5,6 +5,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # A biblioteca suporta Node 20: os tipos acompanham essa versão.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # typescript-eslint e typedoc ainda não suportam TypeScript 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -13,3 +20,9 @@ updates:
     directory: /tests/consumer
     schedule:
       interval: weekly
+    ignore:
+      # O consumidor valida o pacote com TypeScript 5 e tipos do Node 20.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
