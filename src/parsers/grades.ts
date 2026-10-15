@@ -32,9 +32,19 @@ export interface GradeReport {
   /** Resultado final. */
   finalGrade?: number;
   absences?: number;
-  /** Situação (ex.: `APR`, `REP`, `MATR`). */
+  /** Situação, código cru do SIGAA (ex.: `APR`, `REP`, `MATR`). */
   situation?: string;
+  /** `situation` normalizada. `REP` não distingue nota de falta no SIGAA. */
+  status?: GradeStatus;
 }
+
+export type GradeStatus = 'APROVADO' | 'REPROVADO' | 'MATRICULADO' | 'OUTRO';
+
+const STATUS: Record<string, GradeStatus> = {
+  APR: 'APROVADO',
+  REP: 'REPROVADO',
+  MATR: 'MATRICULADO'
+};
 
 const METHODS: Record<string, UnitMethod> = {
   S: 'sum',
@@ -113,7 +123,10 @@ export function parseGrades(page: Page): GradeReport {
       else if (label === 'faltas' && value !== undefined) report.absences = value;
       else if (label.startsWith('sit')) {
         const situation = textOf($(cells[index]));
-        if (situation) report.situation = situation;
+        if (situation) {
+          report.situation = situation;
+          report.status = STATUS[situation] ?? 'OUTRO';
+        }
       }
     }
   });

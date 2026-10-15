@@ -97,6 +97,19 @@ describe('perfil e turmas', () => {
   });
 });
 
+describe('getCourses({ withDetails })', () => {
+  it('traz todas as seções e junta as falhas em vez de lançar', async () => {
+    const { client } = await loggedIn();
+    const { courses, failures } = await client.getCourses({ withDetails: true });
+    expect(courses).toHaveLength(2);
+    expect(courses[0]?.details.grades?.finalGrade).toBe(3.5);
+    expect(courses[0]?.details.members?.students).toHaveLength(2);
+    // cada falha identifica turma e seção; as demais seções continuam preenchidas
+    for (const f of failures) expect(courses.some((c) => c.course.id === f.courseId)).toBe(true);
+    expect(Object.keys(courses[0]!.details).length + failures.length).toBeGreaterThanOrEqual(7);
+  });
+});
+
 describe('seções da turma', () => {
   it('lê frequência, notas, participantes, plano e aulas', async () => {
     const { client } = await loggedIn();
@@ -144,7 +157,7 @@ describe('seções da turma', () => {
     const { client } = await loggedIn();
     const [course] = await client.getCourses();
     const [news] = await course!.getNews();
-    expect(news?.date).toEqual(new Date(2026, 9, 1));
+    expect(news?.date).toBe('2026-10-01');
     const content = await news!.read();
     expect(content.text).toContain('Primeiro parágrafo.');
     // a navegação continua válida depois de abrir uma notícia

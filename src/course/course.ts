@@ -2,7 +2,7 @@ import { NotFoundError, UnexpectedPageError } from '../errors.js';
 import { buildLinkRequest } from '../jsf/form.js';
 import type { StreamResponse } from '../http/http-client.js';
 import { parseAttendance, type AttendanceReport } from '../parsers/absences.js';
-import type { CourseInfo } from '../parsers/courses.js';
+import { courseKey, type CourseInfo } from '../parsers/courses.js';
 import { parseFileList, type FileSummary } from '../parsers/files.js';
 import { parseGrades, type GradeReport } from '../parsers/grades.js';
 import { parseLessons, type Lesson } from '../parsers/lessons.js';
@@ -14,7 +14,8 @@ import {
   type NewsSummary
 } from '../parsers/news.js';
 import { parseSyllabus, type Syllabus } from '../parsers/syllabus.js';
-import type { Page } from '../page.js';
+import { parseSchedule, sectionBase, type Slot } from '../schedule.js';
+import { runParser, type Page } from '../page.js';
 import type { Session } from '../session.js';
 import { saveResponse, type DownloadOptions, type DownloadResult } from './download.js';
 import { MENU, type CourseNavigator } from './navigator.js';
@@ -28,7 +29,7 @@ interface CourseContext {
 /** Notícia da turma. */
 export class NewsItem {
   readonly title: string;
-  readonly date: Date;
+  readonly date: string;
 
   /** @internal */
   constructor(
@@ -113,10 +114,16 @@ export class Course {
   readonly code: string;
   readonly name: string;
   readonly section: string;
+  /** Só os dígitos iniciais de `section`. */
+  readonly sectionBase: string;
   readonly period: string;
   readonly workloadHours: number | undefined;
   /** Horário em código SIGAA (`35N34`); vazio se não informado. */
   readonly schedule: string;
+  /** Horário resolvido (`day` 2 = segunda ... 7 = sábado). */
+  readonly slots: Slot[];
+  /** Chave estável `período|código|turma`, igual entre sessões. */
+  readonly id: string;
 
   private readonly context: CourseContext;
 
@@ -125,9 +132,12 @@ export class Course {
     this.code = info.code;
     this.name = info.name;
     this.section = info.section;
+    this.sectionBase = sectionBase(info.section);
     this.period = info.period;
     this.workloadHours = info.workloadHours;
     this.schedule = info.schedule;
+    this.slots = parseSchedule(info.schedule);
+    this.id = courseKey(info);
     this.context = { session, navigator, info };
   }
 
@@ -169,6 +179,8 @@ export class Course {
   }
 
   private read<T>(section: (typeof MENU)[keyof typeof MENU], parse: (page: Page) => T): Promise<T> {
-    return this.context.navigator.withSection(this.context.info, section, parse);
+    return this.context.navigator.withSection(this.context.info, section, (page) =>
+      runParser(parse, page)
+    );
   }
 }

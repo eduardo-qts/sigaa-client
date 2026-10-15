@@ -1,13 +1,13 @@
 import { UnexpectedPageError } from '../errors.js';
 import { parseJsfLink, type JsfLink } from '../jsf/form.js';
 import type { Page } from '../page.js';
-import { fold, parseBrDate, textOf } from '../util/text.js';
+import { fold, parseBrIso, textOf } from '../util/text.js';
 
 /** Notícia da turma, como aparece na listagem. */
 export interface NewsSummary {
   title: string;
   /** Data de publicação (sem horário). */
-  date: Date;
+  date: string;
 }
 
 export interface NewsRow {
@@ -19,7 +19,7 @@ export interface NewsRow {
 export interface NewsContent {
   title: string;
   /** Data e hora de publicação. */
-  publishedAt?: Date;
+  publishedAt?: string;
   /** Texto simples, com quebras de linha entre parágrafos. */
   text: string;
   /** HTML original do corpo da notícia. */
@@ -39,7 +39,7 @@ export function parseNewsList(page: Page): NewsRow[] {
   const rows: NewsRow[] = [];
   table.find('tbody tr').each((_, tr) => {
     const cells = $(tr).children('td');
-    const date = parseBrDate(textOf(cells.eq(1)));
+    const date = parseBrIso(textOf(cells.eq(1)));
     const link = parseJsfLink(cells.find('a[onclick]').first().attr('onclick'));
     if (!date || !link) return;
     rows.push({ summary: { title: textOf(cells.eq(0)), date }, link });
@@ -73,7 +73,7 @@ export function parseNewsContent(page: Page): NewsContent {
     .replace(/ ?\n ?/g, '\n')
     .replace(/\n{2,}/g, '\n')
     .trim();
-  const publishedAt = parseBrDate(field('Data'));
+  const publishedAt = parseBrIso(field('Data'));
   return {
     title: field('Título'),
     ...(publishedAt ? { publishedAt } : {}),

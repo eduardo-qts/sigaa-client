@@ -1,15 +1,15 @@
 import type { Page } from '../page.js';
 import { UnexpectedPageError } from '../errors.js';
-import { fold, parseBrDate, textOf } from '../util/text.js';
+import { fold, parseBrIso, textOf } from '../util/text.js';
 
 export interface SyllabusScheduleEntry {
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   description: string;
 }
 
 export interface SyllabusEvaluation {
-  date?: Date;
+  date?: string;
   description: string;
 }
 
@@ -69,8 +69,8 @@ export function parseSyllabus(page: Page): Syllabus {
     } else if (caption.startsWith('cronograma')) {
       for (const row of rows) {
         const [start = '', end = '', description = ''] = cells(row);
-        const startDate = parseBrDate(start);
-        const endDate = parseBrDate(end);
+        const startDate = parseBrIso(start);
+        const endDate = parseBrIso(end);
         syllabus.schedule.push({
           description,
           ...(startDate ? { startDate } : {}),
@@ -80,7 +80,7 @@ export function parseSyllabus(page: Page): Syllabus {
     } else if (caption.startsWith('avaliac')) {
       for (const row of rows) {
         const [date = '', description = ''] = cells(row);
-        const parsed = parseBrDate(date);
+        const parsed = parseBrIso(date);
         syllabus.evaluations.push({ description, ...(parsed ? { date: parsed } : {}) });
       }
     } else if (

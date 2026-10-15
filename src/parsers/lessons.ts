@@ -1,6 +1,6 @@
 import type { Page } from '../page.js';
 import { UnexpectedPageError } from '../errors.js';
-import { clean, parseBrDate, textOf } from '../util/text.js';
+import { clean, parseBrIso, textOf } from '../util/text.js';
 
 /** Material ou atividade anexado a um tópico de aula. */
 export interface LessonItem {
@@ -11,8 +11,8 @@ export interface LessonItem {
 /** Tópico de aula da página principal da turma. */
 export interface Lesson {
   title: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   /** Texto do tópico, sem os materiais anexados. */
   content: string;
   items: LessonItem[];
@@ -33,8 +33,8 @@ export function parseLessons(page: Page): Lesson[] {
     .map((topic): Lesson => {
       const headline = clean($(topic).find('.titulo').first().text());
       const period = PERIOD.exec(headline);
-      const startDate = period?.[1] ? parseBrDate(period[1]) : undefined;
-      const endDate = period?.[2] ? parseBrDate(period[2]) : undefined;
+      const startDate = period?.[1] ? parseBrIso(period[1]) : undefined;
+      const endDate = period?.[2] ? parseBrIso(period[2]) : undefined;
 
       const body = $(topic).find('.conteudotopico').first().clone();
       const items = body

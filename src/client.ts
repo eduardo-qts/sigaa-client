@@ -1,9 +1,13 @@
 import { login, logout, STUDENT_PORTAL_PATH } from './auth.js';
 import { Course } from './course/course.js';
+import { loadDetails, type DetailedCourses } from './course/details.js';
 import { CourseNavigator } from './course/navigator.js';
-import { AuthenticationError } from './errors.js';
+import { AuthenticationError, UnexpectedPageError } from './errors.js';
 import { CookieJar } from './http/cookie-jar.js';
 import { defaultUserAgent, HttpClient } from './http/http-client.js';
+import { buildFormRequest } from './jsf/form.js';
+import { runParser } from './page.js';
+import { parseEnrollment, type Enrollment } from './parsers/enrollment.js';
 import { parseProfile, type Profile } from './parsers/profile.js';
 import { Session } from './session.js';
 import { TeacherDirectory } from './teachers.js';
@@ -36,6 +40,11 @@ export interface GetCoursesOptions {
    * entre as turmas do aluno.
    */
   period?: string;
+  /**
+   * Lê também todas as seções de cada turma e devolve `{ courses, failures }`: uma seção
+   * que falha não derruba as demais. Faz várias requisições por turma.
+   */
+  withDetails?: boolean;
 }
 
 /** Cliente do SIGAA da UFSJ. Uma instância representa uma sessão. */
@@ -82,17 +91,45 @@ export class SigaaClient {
     this.session.requireAuthentication();
     return this.session.queue.run(async () => {
       this.navigator.invalidate();
-      return parseProfile(await this.session.get(STUDENT_PORTAL_PATH));
+      return runParser(parseProfile, await this.session.get(STUDENT_PORTAL_PATH));
+    });
+  }
+
+  /** Atestado de matrícula do período corrente: todas as turmas, com status, sala, docentes e horários. */
+  async getEnrollment(): Promise<Enrollment> {
+    this.session.requireAuthentication();
+    return this.session.queue.run(async () => {
+      this.navigator.invalidate();
+      const home = await this.session.get(STUDENT_PORTAL_PATH);
+      // O menu do portal é JSCook: o item é um valor de `jscook_action`, não um link.
+      const action =
+        /menu_form_menu_discente[^'"]*?:A\]#\{\s*portalDiscente\.atestadoMatricula\s*\}/.exec(
+          home.html
+        )?.[0];
+      if (!action) {
+        throw new UnexpectedPageError('Item "Atestado de Matrícula" não encontrado no menu.', {
+          path: home.url.pathname
+        });
+      }
+      const request = buildFormRequest(home, 'form[id="menu:form_menu_discente"]', {
+        jscook_action: action
+      });
+      return runParser(parseEnrollment, await this.session.send(request));
     });
   }
 
   /** Turmas do aluno. Por padrão, as do período mais recente. */
-  async getCourses({ period }: GetCoursesOptions = {}): Promise<Course[]> {
+  async getCourses(options: GetCoursesOptions & { withDetails: true }): Promise<DetailedCourses>;
+  async getCourses(options?: GetCoursesOptions): Promise<Course[]>;
+  async getCourses({ period, withDetails }: GetCoursesOptions = {}): Promise<
+    Course[] | DetailedCourses
+  > {
     const rows = await this.navigator.list();
     const wanted =
       period ?? rows.map((row) => row.info.period).reduce((a, b) => (b > a ? b : a), '');
-    return rows
+    const courses = rows
       .filter((row) => period === 'all' || row.info.period === wanted)
       .map((row) => new Course(row.info, this.session, this.navigator));
+    return withDetails ? loadDetails(courses) : courses;
   }
 }

@@ -108,7 +108,8 @@ describe('parseGrades', () => {
       ],
       finalGrade: 3.5,
       absences: 4,
-      situation: 'REP'
+      situation: 'REP',
+      status: 'REPROVADO'
     });
   });
 
@@ -176,14 +177,14 @@ describe('parseMembers', () => {
 describe('parseNews', () => {
   it('lê a listagem e trata turma sem notícias', () => {
     const rows = parseNewsList(section(pages.newsBody([{ title: 'Aviso', date: '01/10/2026' }])));
-    expect(rows.map((r) => r.summary)).toEqual([{ title: 'Aviso', date: new Date(2026, 9, 1) }]);
+    expect(rows.map((r) => r.summary)).toEqual([{ title: 'Aviso', date: '2026-10-01' }]);
     expect(parseNewsList(section(pages.newsBody([])))).toEqual([]);
   });
 
   it('lê o conteúdo completo da notícia', () => {
     const content = parseNewsContent(page(pages.newsDetailPage('Aviso importante')));
     expect(content.title).toBe('Aviso importante');
-    expect(content.publishedAt).toEqual(new Date(2026, 9, 1, 8, 17));
+    expect(content.publishedAt).toEqual('2026-10-01T08:17');
     expect(content.text).toBe('Primeiro parágrafo.\nSegundo parágrafo.\nLinha nova.');
     expect(content.html).toContain('<p>Primeiro parágrafo.</p>');
   });
@@ -215,12 +216,12 @@ describe('parseLessons', () => {
     expect(lessons).toEqual([
       {
         title: 'Introdução ao curso',
-        startDate: new Date(2026, 7, 10),
-        endDate: new Date(2026, 7, 10),
+        startDate: '2026-08-10',
+        endDate: '2026-08-10',
         content: 'Leitura inicial recomendada.',
         items: [{ title: 'Lista 01', description: 'Exercícios' }]
       },
-      { title: 'Não haverá aula', startDate: new Date(2026, 7, 12), content: '', items: [] }
+      { title: 'Não haverá aula', startDate: '2026-08-12', content: '', items: [] }
     ]);
   });
 });
@@ -235,12 +236,12 @@ describe('parseSyllabus', () => {
       schedule: [
         {
           description: 'Apresentação',
-          startDate: new Date(2025, 2, 25),
-          endDate: new Date(2025, 2, 25)
+          startDate: '2025-03-25',
+          endDate: '2025-03-25'
         },
-        { description: 'Revisão', startDate: new Date(2025, 2, 27) }
+        { description: 'Revisão', startDate: '2025-03-27' }
       ],
-      evaluations: [{ description: '1ª Avaliação', date: new Date(2025, 6, 15) }],
+      evaluations: [{ description: '1ª Avaliação', date: '2025-07-15' }],
       basicReferences: [],
       complementaryReferences: [{ type: 'Livro', description: 'AUTOR, Fulano. Título do livro.' }]
     });

@@ -1,6 +1,6 @@
 import { buildLinkRequest } from '../jsf/form.js';
 import { NotFoundError, UnexpectedPageError } from '../errors.js';
-import type { Page } from '../page.js';
+import { runParser, type Page } from '../page.js';
 import { courseKey, parseCourseList, type CourseInfo, type CourseRow } from '../parsers/courses.js';
 import type { Session } from '../session.js';
 import { fold, textOf } from '../util/text.js';
@@ -48,7 +48,7 @@ export class CourseNavigator {
     this.session.requireAuthentication();
     return this.session.queue.run(async () => {
       this.invalidate();
-      return parseCourseList(await this.session.get(COURSES_PATH));
+      return runParser(parseCourseList, await this.session.get(COURSES_PATH));
     });
   }
 

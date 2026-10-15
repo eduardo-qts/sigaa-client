@@ -38,7 +38,7 @@ internamente: pode usar `Promise.all` entre turmas diferentes com segurança
 
 ```ts
 const a = await course.getAttendance();
-a.days; // [{ date: Date, absences: number }] (0 = presente)
+a.days; // [{ date: "AAAA-MM-DD", absences: number }] (0 = presente)
 a.totalAbsences; // soma das faltas dos dias registrados
 a.presencesRecorded; // opcionais, conforme a página:
 a.classesWithRecord;
@@ -110,7 +110,7 @@ const lessons = await course.getLessons();
 ```ts
 const news = (await course.getNews())[0];
 if (!news) throw new Error('A turma não tem notícias.');
-console.log(news.title, news.date); // data sem horário
+console.log(news.title, news.date); // "AAAA-MM-DD"
 const content = await news.read();
 console.log(content.publishedAt, content.text); // content.html tem o HTML original
 ```
