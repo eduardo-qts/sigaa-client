@@ -30,15 +30,15 @@ new SigaaClient(options?: SigaaClientOptions)
 | `userAgent`          | `string`          | `sigaa-client/<versão> (...)` |
 | `fetch`              | `typeof fetch`    | `fetch` global                |
 
-| Membro                 | Retorno               | Descrição                                                                                                                   |
-| ---------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `isAuthenticated`      | `boolean`             | Há sessão autenticada                                                                                                       |
-| `login(credentials)`   | `Promise<void>`       | `Credentials = { username, password }`                                                                                      |
-| `logout()`             | `Promise<void>`       | Encerra a sessão e limpa cookies                                                                                            |
-| `getProfile()`         | `Promise<Profile>`    | Perfil do discente                                                                                                          |
+| Membro                 | Retorno               | Descrição                                                                                                                  |
+| ---------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `isAuthenticated`      | `boolean`             | Há sessão autenticada                                                                                                      |
+| `login(credentials)`   | `Promise<void>`       | `Credentials = { username, password }`                                                                                     |
+| `logout()`             | `Promise<void>`       | Encerra a sessão e limpa cookies                                                                                           |
+| `getProfile()`         | `Promise<Profile>`    | Perfil do discente                                                                                                         |
 | `getCourses(options?)` | `Promise<Course[]>`   | `GetCoursesOptions = { period?: string; withDetails?: boolean }` (com `withDetails: true` devolve `{ courses, failures }`) |
-| `getEnrollment()`      | `Promise<Enrollment>` | Atestado de matrícula: turmas com `status`, `type`, `room`, `professors`, `slots`, e `declaredTotal`                        |
-| `teachers`             | `TeacherDirectory`    | `listUnits()` e `search(options?)`                                                                                          |
+| `getEnrollment()`      | `Promise<Enrollment>` | Atestado de matrícula: turmas com `status`, `type`, `room`, `professors`, `slots`, e `declaredTotal`                       |
+| `teachers`             | `TeacherDirectory`    | `listUnits()` e `search(options?)`                                                                                         |
 
 `period`: omitido = período mais recente; `'2025.1'` = esse período; `'all'` = todos.
 

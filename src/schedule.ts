@@ -39,7 +39,9 @@ const PERIODS: Record<string, [string, string][]> = {
  */
 export function parseSchedule(code: string): Slot[] {
   const slots: Slot[] = [];
-  for (const [, days = '', shift = '', periods = ''] of code.matchAll(/([2-7]+)([MTN])(\d+)/g)) {
+  for (const token of code.split(/\s+/)) {
+    // Ancorada por token: sem backtracking quadrático em entradas longas.
+    const [, days = '', shift = '', periods = ''] = /^([2-7]+)([MTN])(\d+)$/.exec(token) ?? [];
     const grid = PERIODS[shift] ?? [];
     const times = Array.from(periods, (p) => grid[Number(p) - 1]);
     // ponytail: assume tempos em ordem crescente e consecutivos; ceiling = códigos com buracos (ex.: 135)

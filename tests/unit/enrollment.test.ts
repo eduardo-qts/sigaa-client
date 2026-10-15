@@ -22,6 +22,7 @@ describe('parseSchedule', () => {
       { day: 2, start: '13:15', end: '15:05' }
     ]);
     expect(parseSchedule('')).toEqual([]);
+    expect(parseSchedule(`${'2'.repeat(100_000)}x`)).toEqual([]); // sem backtracking quadrático
   });
 });
 
