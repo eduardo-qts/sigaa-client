@@ -67,6 +67,11 @@ export class TimeoutError extends NetworkError {
 
 /** O HTML recebido não tem a estrutura esperada (o SIGAA pode ter mudado). */
 export class UnexpectedPageError extends SigaaError {
+  /** Nome da função de parsing que falhou (ex.: `parseGrades`). */
+  parser: string | undefined;
+  /** Esqueleto da página (tags, ids e classes, sem texto), seguro para reportar. */
+  structure: string | undefined;
+
   constructor(message: string, options?: SigaaErrorOptions) {
     super('UNEXPECTED_PAGE', message, options);
   }

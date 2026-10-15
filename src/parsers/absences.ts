@@ -1,11 +1,11 @@
 import { load } from 'cheerio';
 import { UnexpectedPageError } from '../errors.js';
 import type { Page } from '../page.js';
-import { clean, fold, parseBrDate, textOf } from '../util/text.js';
+import { clean, fold, parseBrIso, textOf } from '../util/text.js';
 
 /** Frequência de um dia de aula. */
 export interface AbsenceDay {
-  date: Date;
+  date: string;
   /** Faltas no dia; `0` quando presente. */
   absences: number;
 }
@@ -46,7 +46,7 @@ export function parseAttendance(page: Page): AttendanceReport {
   const days: AbsenceDay[] = [];
   table.find('tbody tr').each((_, row) => {
     const cells = $(row).children('td');
-    const date = parseBrDate(textOf(cells.eq(0)));
+    const date = parseBrIso(textOf(cells.eq(0)));
     const status = fold(textOf(cells.eq(1)));
     if (!date || !status || status.startsWith('nao ')) return;
     if (status === 'presente') days.push({ date, absences: 0 });

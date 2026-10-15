@@ -37,3 +37,17 @@ export function parseDecimal(text: string): number | undefined {
   if (!/^-?\d+(\.\d+)?$/.test(normalized)) return undefined;
   return Number(normalized);
 }
+
+/** `Date` local para `AAAA-MM-DD` (sem fuso, para serializar sem surpresas). */
+export const toIsoDate = (date: Date): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+/** Como {@link parseBrDate}, mas devolve ISO local: `AAAA-MM-DD` ou `AAAA-MM-DDTHH:MM` se houver hora. */
+export function parseBrIso(text: string): string | undefined {
+  const date = parseBrDate(text);
+  if (!date) return undefined;
+  const time = /\d{1,2}[:h]\d{2}/.test(text)
+    ? `T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+    : '';
+  return toIsoDate(date) + time;
+}

@@ -1,6 +1,6 @@
 {
   "name": "sigaa-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Cliente TypeScript não oficial para o SIGAA da UFSJ (Universidade Federal de São João del-Rei).",
   "keywords": [
     "sigaa",

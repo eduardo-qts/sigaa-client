@@ -23,6 +23,8 @@ describe('sanitizeFilename', () => {
     ['a<b>:c|d?.txt', 'a_b__c_d_.txt'],
     ['.hidden', 'hidden'],
     ['   ', 'arquivo'],
+    [' .', 'arquivo'],
+    [' . a', 'a'],
     ['', 'arquivo']
   ])('%j vira %j', (input, expected) => {
     expect(sanitizeFilename(input)).toBe(expected);
