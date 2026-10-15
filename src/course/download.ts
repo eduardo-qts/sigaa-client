@@ -28,7 +28,7 @@ const UNSAFE_CHARACTERS = /[\u0000-\u001f\u007f<>:"|?*]/g;
 export function sanitizeFilename(name: string): string {
   const base = basename(name.replace(/\\/g, '/'))
     .replace(UNSAFE_CHARACTERS, '_')
-    .replace(/^\.+/, '')
+    .replace(/^[\s.]+/, '')
     .trim()
     .slice(0, 200);
   return base || 'arquivo';
